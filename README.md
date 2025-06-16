@@ -16,8 +16,8 @@
 
 1. Clone repository:
 ```bash
-git clone <repository-url>
-cd flashcard_project-CL
+git clone https://github.com/ngcvien/ai_flashcard_generator.git
+cd ai_flashcard_generator
 ```
 
 2. Cài đặt các thư viện cần thiết:
@@ -65,7 +65,7 @@ Truy cập http://localhost:5000 để bắt đầu sử dụng.
 ## Cấu trúc thư mục
 
 ```
-flashcard_project-CL/
+ai_flashcard_generator/
 ├── app.py              # File chính của ứng dụng
 ├── requirements.txt    # Các thư viện cần thiết
 ├── data/              # Lưu trữ các bộ flashcard
