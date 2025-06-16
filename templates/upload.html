@@ -4,10 +4,10 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="col-12 col-lg-8">
         <div class="card">
             <div class="card-header">
-                <h3><i class="fas fa-upload"></i> Tải file lên để tạo flashcard</h3>
+                <h3 class="h4 mb-0"><i class="fas fa-upload"></i> Tải file lên để tạo flashcard</h3>
             </div>
             <div class="card-body">
                 <form id="uploadForm" enctype="multipart/form-data">
@@ -16,7 +16,7 @@
                         <input type="text" class="form-control" id="title" name="title" 
                                placeholder="Nhập tiêu đề cho bộ flashcard">
                     </div>
-                      <div class="mb-4">
+                    <div class="mb-4">
                         <label for="num_cards" class="form-label">Số lượng flashcard muốn tạo</label>
                         <input type="number" class="form-control" id="num_cards" name="num_cards" 
                                value="10" min="5" max="50">
@@ -37,16 +37,16 @@
                     <div class="mb-4">
                         <label class="form-label">Chọn file</label>
                         <div class="upload-area" id="uploadArea">
-                            <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-muted"></i>
+                            <i class="fas fa-cloud-upload-alt fa-2x fa-3x-md mb-3 text-muted"></i>
                             <p class="mb-2">Kéo thả file vào đây hoặc click để chọn</p>
                             <p class="small text-muted">Hỗ trợ: PDF, DOCX, TXT (tối đa 16MB)</p>
                             <input type="file" class="form-control d-none" id="fileInput" name="file" 
                                    accept=".pdf,.docx,.txt">
                         </div>
                         <div id="fileInfo" class="mt-2 d-none">
-                            <div class="alert alert-info">
-                                <i class="fas fa-file"></i>
-                                <span id="fileName"></span>
+                            <div class="alert alert-info d-flex align-items-center">
+                                <i class="fas fa-file me-2"></i>
+                                <span id="fileName" class="flex-grow-1 text-truncate"></span>
                                 <button type="button" class="btn btn-sm btn-outline-danger ms-2" 
                                         onclick="clearFile()">
                                     <i class="fas fa-times"></i>
@@ -58,7 +58,8 @@
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
                             <i class="fas fa-magic"></i>
-                            Tạo flashcard với AI
+                            <span class="d-none d-sm-inline">Tạo flashcard với AI</span>
+                            <span class="d-inline d-sm-none">Tạo flashcard</span>
                         </button>
                     </div>
                 </form>
@@ -82,8 +83,8 @@
         
         <div class="card mt-4">
             <div class="card-body">
-                <h5><i class="fas fa-lightbulb text-warning"></i> Mẹo để có kết quả tốt nhất:</h5>
-                <ul>
+                <h5 class="h6 mb-3"><i class="fas fa-lightbulb text-warning"></i> Mẹo để có kết quả tốt nhất:</h5>
+                <ul class="mb-0">
                     <li>File nên có nội dung rõ ràng, có cấu trúc</li>
                     <li>Tránh file có quá nhiều hình ảnh hoặc biểu đồ</li>
                     <li>Nội dung tiếng Việt hoặc tiếng Anh đều được hỗ trợ</li>
@@ -195,8 +196,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     result.innerHTML = `
                         <div class="alert alert-success">
-                            <h5><i class="fas fa-check-circle"></i> Tạo flashcard thành công!</h5>
-                            <p>Đã tạo ${data.count} flashcard từ file của bạn.</p>
+                            <h5 class="h6"><i class="fas fa-check-circle"></i> Tạo flashcard thành công!</h5>
+                            <p class="mb-3">Đã tạo ${data.count} flashcard từ file của bạn.</p>
                             <a href="/study/${data.flashcard_id}" class="btn btn-primary">
                                 <i class="fas fa-play"></i> Bắt đầu học ngay
                             </a>
@@ -205,8 +206,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     result.innerHTML = `
                         <div class="alert alert-danger">
-                            <h5><i class="fas fa-exclamation-circle"></i> Có lỗi xảy ra!</h5>
-                            <p>${data.error}</p>
+                            <h5 class="h6"><i class="fas fa-exclamation-circle"></i> Có lỗi xảy ra!</h5>
+                            <p class="mb-0">${data.error}</p>
                         </div>
                     `;
                 }
@@ -221,8 +222,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             result.innerHTML = `
                 <div class="alert alert-danger">
-                    <h5><i class="fas fa-exclamation-circle"></i> Có lỗi xảy ra!</h5>
-                    <p>Không thể kết nối đến server. Vui lòng thử lại.</p>
+                    <h5 class="h6"><i class="fas fa-exclamation-circle"></i> Có lỗi xảy ra!</h5>
+                    <p class="mb-0">Không thể kết nối đến server. Vui lòng thử lại.</p>
                 </div>
             `;
             result.classList.remove('d-none');

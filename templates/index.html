@@ -5,24 +5,26 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body text-center">
-                <h1 class="card-title mb-4">
+                <h1 class="card-title h2 h1-md mb-4">
                     <i class="fas fa-brain text-primary"></i>
                     AI Flashcard Generator
                 </h1>
                 <p class="card-text lead mb-4">
                     Tạo flashcard thông minh từ tài liệu của bạn bằng AI
                 </p>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
                         <a href="{{ url_for('upload_file') }}" class="btn btn-primary btn-lg w-100">
                             <i class="fas fa-upload"></i>
-                            Tải file lên để tạo flashcard
+                            <span class="d-none d-sm-inline">Tải file lên để tạo flashcard</span>
+                            <span class="d-inline d-sm-none">Tải file lên</span>
                         </a>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-12 col-md-6">
                         <a href="{{ url_for('create_manual') }}" class="btn btn-outline-primary btn-lg w-100">
                             <i class="fas fa-plus"></i>
-                            Tạo flashcard thủ công
+                            <span class="d-none d-sm-inline">Tạo flashcard thủ công</span>
+                            <span class="d-inline d-sm-none">Tạo thủ công</span>
                         </a>
                     </div>
                 </div>
@@ -32,19 +34,19 @@
 </div>
 
 {% if flashcard_sets %}
-<div class="row mt-5">
+<div class="row mt-4 mt-md-5">
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h3><i class="fas fa-folder"></i> Bộ flashcard của bạn</h3>
+                <h3 class="h4 mb-0"><i class="fas fa-folder"></i> Bộ flashcard của bạn</h3>
             </div>
             <div class="card-body">
-                <div class="row">
+                <div class="row g-3">
                     {% for set in flashcard_sets %}
-                    <div class="col-md-4 mb-3">
+                    <div class="col-12 col-sm-6 col-md-4">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title">{{ set.title }}</h5>
+                                <h5 class="card-title h6">{{ set.title }}</h5>
                                 <p class="card-text">
                                     <small class="text-muted">
                                         <i class="fas fa-cards-blank"></i> {{ set.count }} thẻ
@@ -55,7 +57,7 @@
                                 <div class="d-flex gap-2">
                                     <a href="{{ url_for('study', flashcard_id=set.id) }}" 
                                        class="btn btn-primary btn-sm flex-fill">
-                                        <i class="fas fa-play"></i> Học
+                                        <i class="fas fa-play"></i> <span class="d-none d-sm-inline">Học</span>
                                     </a>
                                     <button class="btn btn-danger btn-sm" 
                                             onclick="deleteFlashcardSet('{{ set.id }}')">
@@ -73,31 +75,31 @@
 </div>
 {% endif %}
 
-<div class="row mt-5">
+<div class="row mt-4 mt-md-5">
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <h3><i class="fas fa-info-circle text-info"></i> Hướng dẫn sử dụng</h3>
-                <div class="row mt-3">
-                    <div class="col-md-4">
+                <h3 class="h4 mb-3"><i class="fas fa-info-circle text-info"></i> Hướng dẫn sử dụng</h3>
+                <div class="row g-4">
+                    <div class="col-12 col-md-4">
                         <div class="text-center">
-                            <i class="fas fa-file-upload fa-3x text-primary mb-3"></i>
-                            <h5>1. Tải file lên</h5>
-                            <p>Hỗ trợ file PDF, DOCX, TXT</p>
+                            <i class="fas fa-file-upload fa-2x fa-3x-md text-primary mb-3"></i>
+                            <h5 class="h6">1. Tải file lên</h5>
+                            <p class="small">Hỗ trợ file PDF, DOCX, TXT</p>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-12 col-md-4">
                         <div class="text-center">
-                            <i class="fas fa-magic fa-3x text-success mb-3"></i>
-                            <h5>2. AI tạo flashcard</h5>
-                            <p>AI tự động tạo câu hỏi và đáp án</p>
+                            <i class="fas fa-magic fa-2x fa-3x-md text-success mb-3"></i>
+                            <h5 class="h6">2. AI tạo flashcard</h5>
+                            <p class="small">AI tự động tạo câu hỏi và đáp án</p>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-12 col-md-4">
                         <div class="text-center">
-                            <i class="fas fa-graduation-cap fa-3x text-warning mb-3"></i>
-                            <h5>3. Bắt đầu học</h5>
-                            <p>Luyện tập với flashcard được tạo</p>
+                            <i class="fas fa-graduation-cap fa-2x fa-3x-md text-warning mb-3"></i>
+                            <h5 class="h6">3. Bắt đầu học</h5>
+                            <p class="small">Luyện tập với flashcard được tạo</p>
                         </div>
                     </div>
                 </div>

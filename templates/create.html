@@ -4,10 +4,10 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-10">
+    <div class="col-12 col-lg-10">
         <div class="card">
             <div class="card-header">
-                <h3><i class="fas fa-plus"></i> Tạo flashcard thủ công</h3>
+                <h3 class="h4 mb-0"><i class="fas fa-plus"></i> Tạo flashcard thủ công</h3>
             </div>
             <div class="card-body">
                 {% if error %}
@@ -27,7 +27,7 @@
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <label class="form-label">Danh sách flashcard</label>
                             <button type="button" class="btn btn-outline-primary btn-sm" onclick="addCard()">
-                                <i class="fas fa-plus"></i> Thêm thẻ
+                                <i class="fas fa-plus"></i> <span class="d-none d-sm-inline">Thêm thẻ</span>
                             </button>
                         </div>
                         
@@ -42,13 +42,13 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-2">
+                                    <div class="row g-3">
+                                        <div class="col-12 col-md-6">
                                             <label class="form-label small">Câu hỏi</label>
                                             <textarea class="form-control question-input" rows="3" 
                                                     placeholder="Nhập câu hỏi..." required></textarea>
                                         </div>
-                                        <div class="col-md-6 mb-2">
+                                        <div class="col-12 col-md-6">
                                             <label class="form-label small">Đáp án</label>
                                             <textarea class="form-control answer-input" rows="3" 
                                                     placeholder="Nhập đáp án..." required></textarea>
@@ -63,7 +63,8 @@
                     
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-save"></i> Tạo bộ flashcard
+                            <i class="fas fa-save"></i> <span class="d-none d-sm-inline">Tạo bộ flashcard</span>
+                            <span class="d-inline d-sm-none">Tạo flashcard</span>
                         </button>
                     </div>
                 </form>
@@ -72,7 +73,7 @@
         
         <div class="card mt-4">
             <div class="card-body">
-                <h5><i class="fas fa-lightbulb text-warning"></i> Mẹo tạo flashcard hiệu quả:</h5>
+                <h5 class="h6 mb-3"><i class="fas fa-lightbulb text-warning"></i> Mẹo tạo flashcard hiệu quả:</h5>
                 <ul class="mb-0">
                     <li><strong>Câu hỏi ngắn gọn:</strong> Đặt câu hỏi rõ ràng, dễ hiểu</li>
                     <li><strong>Đáp án chính xác:</strong> Đưa ra câu trả lời chính xác và đầy đủ</li>
@@ -103,13 +104,13 @@ function addCard() {
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
-                <div class="row">
-                    <div class="col-md-6 mb-2">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
                         <label class="form-label small">Câu hỏi</label>
                         <textarea class="form-control question-input" rows="3" 
                                 placeholder="Nhập câu hỏi..." required></textarea>
                     </div>
-                    <div class="col-md-6 mb-2">
+                    <div class="col-12 col-md-6">
                         <label class="form-label small">Đáp án</label>
                         <textarea class="form-control answer-input" rows="3" 
                                 placeholder="Nhập đáp án..." required></textarea>

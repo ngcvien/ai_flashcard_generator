@@ -4,23 +4,23 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-10">
+    <div class="col-12 col-lg-10">
         <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3><i class="fas fa-graduation-cap"></i> {{ data.title }}</h3>
-                <div>
+            <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <h3 class="h4 mb-2 mb-md-0"><i class="fas fa-graduation-cap"></i> {{ data.title }}</h3>
+                <div class="d-flex align-items-center">
                     <span class="badge bg-primary me-2">
                         <span id="currentCard">1</span> / {{ data.flashcards|length }}
                     </span>
                     <button class="btn btn-sm btn-outline-secondary" onclick="shuffleCards()">
-                        <i class="fas fa-shuffle"></i> Xáo trộn
+                        <i class="fas fa-shuffle"></i> <span class="d-none d-sm-inline">Xáo trộn</span>
                     </button>
                 </div>
             </div>
         </div>
 
         <div class="row">
-            <div class="col-lg-8">
+            <div class="col-12 col-lg-8">
                 <div class="flashcard mb-4" id="flashcard" onclick="flipCard()">
                     <div class="flashcard-inner" id="flashcardInner">
                         <div class="flashcard-front">
@@ -40,24 +40,24 @@
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <button class="btn btn-outline-primary" onclick="previousCard()" id="prevBtn">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4 gap-2">
+                    <button class="btn btn-outline-light w-100 w-sm-auto" onclick="previousCard()" id="prevBtn">
                         <i class="fas fa-chevron-left"></i> Trước
                     </button>
                     
-                    <div class="btn-group" role="group">
+                    <div class="btn-group w-100 w-sm-auto" role="group">
                         <button class="btn btn-success" onclick="markCard('easy')">
-                            <i class="fas fa-smile"></i> Dễ
+                            <i class="fas fa-smile"></i> <span class="d-none d-sm-inline">Dễ</span>
                         </button>
                         <button class="btn btn-warning" onclick="markCard('medium')">
-                            <i class="fas fa-meh"></i> Trung bình  
+                            <i class="fas fa-meh"></i> <span class="d-none d-sm-inline">TB</span>
                         </button>
                         <button class="btn btn-danger" onclick="markCard('hard')">
-                            <i class="fas fa-frown"></i> Khó
+                            <i class="fas fa-frown"></i> <span class="d-none d-sm-inline">Khó</span>
                         </button>
                     </div>
                     
-                    <button class="btn btn-outline-primary" onclick="nextCard()" id="nextBtn">
+                    <button class="btn btn-outline-light w-100 w-sm-auto" onclick="nextCard()" id="nextBtn">
                         Tiếp <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
@@ -67,10 +67,10 @@
                 </div>
             </div>
 
-            <div class="col-lg-4">
+            <div class="col-12 col-lg-4">
                 <div class="card">
                     <div class="card-header">
-                        <h5><i class="fas fa-chart-bar"></i> Thống kê</h5>
+                        <h5 class="h6 mb-0"><i class="fas fa-chart-bar"></i> Thống kê</h5>
                     </div>
                     <div class="card-body">
                         <div class="row text-center">
@@ -115,7 +115,7 @@
 
                 <div class="card mt-3">
                     <div class="card-header">
-                        <h6><i class="fas fa-keyboard"></i> Phím tắt</h6>
+                        <h6 class="mb-0"><i class="fas fa-keyboard"></i> Phím tắt</h6>
                     </div>
                     <div class="card-body">
                         <small>
@@ -135,13 +135,13 @@
 
 <!-- Modal hoàn thành -->
 <div class="modal fade" id="completionModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><i class="fas fa-trophy text-warning"></i> Chúc mừng!</h5>
             </div>
             <div class="modal-body text-center">
-                <h4>Bạn đã hoàn thành bộ flashcard!</h4>
+                <h4 class="h5">Bạn đã hoàn thành bộ flashcard!</h4>
                 <div class="row mt-3">
                     <div class="col-4">
                         <div class="text-success">
@@ -154,7 +154,7 @@
                         <div class="text-warning">
                             <i class="fas fa-meh fa-2x"></i>
                             <p class="mb-0 mt-2"><span id="finalMedium">0</span> thẻ</p>
-                            <small>Trung bình</small>
+                            <small>TB</small>
                         </div>
                     </div>
                     <div class="col-4">
@@ -166,14 +166,14 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-info" onclick="reviewDifficult()">
+            <div class="modal-footer flex-column flex-sm-row">
+                <button type="button" class="btn btn-info w-100 w-sm-auto mb-2 mb-sm-0" onclick="reviewDifficult()">
                     <i class="fas fa-redo"></i> Ôn lại thẻ khó
                 </button>
-                <button type="button" class="btn btn-secondary" onclick="resetProgress()">
+                <button type="button" class="btn btn-secondary w-100 w-sm-auto mb-2 mb-sm-0" onclick="resetProgress()">
                     <i class="fas fa-refresh"></i> Học lại
                 </button>
-                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <a href="{{ url_for('index') }}" class="btn btn-primary w-100 w-sm-auto">
                     <i class="fas fa-home"></i> Về trang chủ
                 </a>
             </div>

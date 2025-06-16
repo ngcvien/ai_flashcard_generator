@@ -314,4 +314,4 @@ def delete_flashcard_set(flashcard_id):
         return jsonify({'error': 'Không thể xóa'}), 400
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
