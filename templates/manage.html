@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Quản lý {{ data.title }} - AI Flashcard Generator{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+        <div class="card mb-4">
+            <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+                <h3 class="h4 mb-0"><i class="fas fa-edit"></i> Quản lý: {{ data.title }}</h3>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('study', flashcard_id=data.id) }}" class="btn btn-primary">
+                        <i class="fas fa-graduation-cap"></i> <span class="d-none d-sm-inline">Học</span>
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-home"></i> <span class="d-none d-sm-inline">Trang chủ</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+                        <h5 class="h6 mb-0">Danh sách câu hỏi ({{ data.flashcards|length }})</h5>
+                        <button class="btn btn-sm btn-success" onclick="addNewCard()">
+                            <i class="fas fa-plus"></i> <span class="d-none d-sm-inline">Thêm câu hỏi</span>
+                        </button>
+                    </div>
+                    <div class="card-body p-0 p-sm-3">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 50px" class="text-center">#</th>
+                                        <th>Câu hỏi</th>
+                                        <th>Đáp án</th>
+                                        <th style="width: 100px" class="text-center">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for card in data.flashcards %}
+                                    <tr id="card-{{ loop.index0 }}">
+                                        <td class="text-center">{{ loop.index }}</td>
+                                        <td class="text-break">{{ card.question }}</td>
+                                        <td class="text-break">{{ card.answer }}</td>
+                                        <td>
+                                            <div class="d-flex justify-content-center gap-1">
+                                                <button class="btn btn-sm btn-primary" onclick="editCard({{ loop.index0 }})" title="Chỉnh sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="deleteCard({{ loop.index0 }})" title="Xóa">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal chỉnh sửa -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chỉnh sửa câu hỏi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="cardIndex" name="card_index">
+                    <input type="hidden" name="action" value="edit">
+                    <div class="mb-3">
+                        <label class="form-label">Câu hỏi</label>
+                        <textarea class="form-control" id="editQuestion" name="question" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Đáp án</label>
+                        <textarea class="form-control" id="editAnswer" name="answer" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer flex-column flex-sm-row">
+                <button type="button" class="btn btn-secondary w-100 w-sm-auto mb-2 mb-sm-0" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary w-100 w-sm-auto" onclick="saveEdit()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal thêm mới -->
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm câu hỏi mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addForm">
+                    <input type="hidden" name="action" value="add">
+                    <div class="mb-3">
+                        <label class="form-label">Câu hỏi</label>
+                        <textarea class="form-control" id="newQuestion" name="question" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Đáp án</label>
+                        <textarea class="form-control" id="newAnswer" name="answer" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer flex-column flex-sm-row">
+                <button type="button" class="btn btn-secondary w-100 w-sm-auto mb-2 mb-sm-0" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary w-100 w-sm-auto" onclick="saveNew()">Thêm</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let editModal;
+let addModal;
+
+document.addEventListener('DOMContentLoaded', function() {
+    editModal = new bootstrap.Modal(document.getElementById('editModal'));
+    addModal = new bootstrap.Modal(document.getElementById('addModal'));
+});
+
+function editCard(index) {
+    const card = {{ data.flashcards | tojson | safe }}[index];
+    document.getElementById('cardIndex').value = index;
+    document.getElementById('editQuestion').value = card.question;
+    document.getElementById('editAnswer').value = card.answer;
+    editModal.show();
+}
+
+function deleteCard(index) {
+    if (confirm('Bạn có chắc muốn xóa câu hỏi này?')) {
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `action=delete&card_index=${index}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`card-${index}`).remove();
+                // Cập nhật số thứ tự
+                updateRowNumbers();
+            }
+        });
+    }
+}
+
+function saveEdit() {
+    const form = document.getElementById('editForm');
+    const formData = new FormData(form);
+    
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const index = formData.get('card_index');
+            const row = document.getElementById(`card-${index}`);
+            row.children[1].textContent = formData.get('question');
+            row.children[2].textContent = formData.get('answer');
+            editModal.hide();
+        }
+    });
+}
+
+function addNewCard() {
+    document.getElementById('newQuestion').value = '';
+    document.getElementById('newAnswer').value = '';
+    addModal.show();
+}
+
+function saveNew() {
+    const form = document.getElementById('addForm');
+    const formData = new FormData(form);
+    
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Tải lại trang để hiển thị thẻ mới
+        }
+    });
+}
+
+function updateRowNumbers() {
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach((row, index) => {
+        row.children[0].textContent = index + 1;
+    });
+}
+</script>
+{% endblock %} 

@@ -313,5 +313,50 @@ def delete_flashcard_set(flashcard_id):
     except:
         return jsonify({'error': 'Không thể xóa'}), 400
 
+@app.route('/manage/<flashcard_id>', methods=['GET', 'POST'])
+def manage_flashcards(flashcard_id):
+    data = load_flashcard_set(flashcard_id)
+    if not data:
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        action = request.form.get('action')
+        card_index = int(request.form.get('card_index', -1))
+        
+        if action == 'delete' and 0 <= card_index < len(data['flashcards']):
+            data['flashcards'].pop(card_index)
+            # Lưu lại sau khi xóa
+            with open(f'data/{flashcard_id}.json', 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            return jsonify({'success': True})
+            
+        elif action == 'edit':
+            question = request.form.get('question')
+            answer = request.form.get('answer')
+            if question and answer and 0 <= card_index < len(data['flashcards']):
+                data['flashcards'][card_index] = {
+                    'question': question,
+                    'answer': answer
+                }
+                # Lưu lại sau khi sửa
+                with open(f'data/{flashcard_id}.json', 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+                return jsonify({'success': True})
+                
+        elif action == 'add':
+            question = request.form.get('question')
+            answer = request.form.get('answer')
+            if question and answer:
+                data['flashcards'].append({
+                    'question': question,
+                    'answer': answer
+                })
+                # Lưu lại sau khi thêm
+                with open(f'data/{flashcard_id}.json', 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+                return jsonify({'success': True})
+    
+    return render_template('manage.html', data=data)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
