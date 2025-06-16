@@ -3,11 +3,8 @@
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-2.3.3-green)](https://flask.palletsprojects.com/)
 [![Google Gemini](https://img.shields.io/badge/AI-Google%20Gemini-orange)](https://deepmind.google/technologies/gemini/)
-[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
 Ứng dụng web giúp tự động tạo flashcard học tập từ tài liệu sử dụng AI (Google Gemini). Ứng dụng cho phép tải lên tài liệu dạng PDF, DOCX hoặc TXT và tự động tạo ra các flashcard học tập với sự hỗ trợ của AI.
-
-🌟 [Demo](#) | 📚 [Documentation](#) | 🐛 [Report Bug](https://github.com/ngcvien/ai_flashcard_generator/issues) | ✨ [Request Feature](https://github.com/ngcvien/ai_flashcard_generator/issues)
 
 ## ✨ Tính năng
 
@@ -157,20 +154,3 @@ Mọi đóng góp đều được hoan nghênh và rất có giá trị. Nếu b
 3. Commit các thay đổi (`git commit -m 'Add some AmazingFeature'`)
 4. Push lên branch (`git push origin feature/AmazingFeature`)
 5. Mở Pull Request
-
-## 📝 License
-
-Được phân phối theo giấy phép MIT. Xem `LICENSE` để biết thêm thông tin.
-
-## 🔒 Bảo mật
-
-- KHÔNG BAO GIỜ commit file `.env` lên repository
-- Bảo vệ API key của bạn
-- Thường xuyên cập nhật các dependencies
-- Backup dữ liệu trong thư mục `data/` định kỳ
-
-## 📧 Liên hệ
-
-Your Name - [@your_twitter](https://twitter.com/your_twitter) - email@example.com
-
-Project Link: [https://github.com/ngcvien/ai_flashcard_generator](https://github.com/ngcvien/ai_flashcard_generator)
