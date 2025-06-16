@@ -1,8 +1,15 @@
 # AI Flashcard Generator
 
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-2.3.3-green)](https://flask.palletsprojects.com/)
+[![Google Gemini](https://img.shields.io/badge/AI-Google%20Gemini-orange)](https://deepmind.google/technologies/gemini/)
+[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
+
 Ứng dụng web giúp tự động tạo flashcard học tập từ tài liệu sử dụng AI (Google Gemini). Ứng dụng cho phép tải lên tài liệu dạng PDF, DOCX hoặc TXT và tự động tạo ra các flashcard học tập với sự hỗ trợ của AI.
 
-## Tính năng
+🌟 [Demo](#) | 📚 [Documentation](#) | 🐛 [Report Bug](https://github.com/ngcvien/ai_flashcard_generator/issues) | ✨ [Request Feature](https://github.com/ngcvien/ai_flashcard_generator/issues)
+
+## ✨ Tính năng
 
 - 🤖 Tự động tạo flashcard từ file PDF, DOCX, TXT sử dụng AI
 - 📝 Cho phép thêm ghi chú hướng dẫn AI tạo flashcard theo ý muốn
@@ -12,7 +19,15 @@
 - 🔄 Chức năng ôn tập lại các thẻ khó
 - ⌨️ Hỗ trợ phím tắt để học nhanh hơn
 
-## Cài đặt
+## 🚀 Bắt đầu
+
+### Prerequisites
+
+- Python 3.8 trở lên
+- Pip (Python package installer)
+- Google Gemini API key
+
+### Cài đặt
 
 1. Clone repository:
 ```bash
@@ -20,17 +35,35 @@ git clone https://github.com/ngcvien/ai_flashcard_generator.git
 cd ai_flashcard_generator
 ```
 
-2. Cài đặt các thư viện cần thiết:
+2. Tạo và kích hoạt môi trường ảo (khuyến nghị):
+```bash
+# Windows
+python -m venv venv
+venv\Scripts\activate
+
+# Linux/MacOS
+python3 -m venv venv
+source venv/bin/activate
+```
+
+3. Cài đặt các thư viện cần thiết:
 ```bash
 pip install -r Requirements.txt
 ```
 
-3. Cấu hình biến môi trường:
-- Tạo file `.env` trong thư mục gốc
-- Thêm các biến môi trường cần thiết vào file:
+4. Cấu hình biến môi trường:
+```bash
+# Windows
+copy .env.example .env
+
+# Linux/MacOS
+cp .env.example .env
 ```
-FLASK_SECRET_KEY=your_secret_key_here
-GOOGLE_API_KEY=your_api_key_here
+
+5. Cập nhật các biến trong file `.env`:
+```ini
+FLASK_SECRET_KEY=your_secret_key_here  # Có thể tạo bằng: python -c "import secrets; print(secrets.token_hex())"
+GOOGLE_API_KEY=your_api_key_here       # Lấy từ Google AI Studio
 ```
 
 4. Chạy ứng dụng:
@@ -95,27 +128,49 @@ ai_flashcard_generator/
 | `FLASK_SECRET_KEY` | Khóa bí mật cho Flask session |
 | `GOOGLE_API_KEY` | API key của Google Gemini |
 
-## Công nghệ sử dụng
+## 🛠️ Công nghệ sử dụng
 
-- Flask: Web framework
-- Google Generative AI (Gemini): Tạo flashcard thông minh
-- Bootstrap 5: Giao diện người dùng
-- PyPDF2: Đọc file PDF
-- python-docx: Đọc file DOCX
-- python-dotenv: Quản lý biến môi trường
+- [Flask](https://flask.palletsprojects.com/): Web framework
+- [Google Generative AI (Gemini)](https://deepmind.google/technologies/gemini/): Tạo flashcard thông minh
+- [Bootstrap 5](https://getbootstrap.com/): Giao diện người dùng
+- [PyPDF2](https://pypdf2.readthedocs.io/): Đọc file PDF
+- [python-docx](https://python-docx.readthedocs.io/): Đọc file DOCX
+- [python-dotenv](https://github.com/theskumar/python-dotenv): Quản lý biến môi trường
 
-## Đóng góp
+## 🚧 Roadmap
 
-Mọi đóng góp đều được hoan nghênh! Vui lòng:
+- [x] Hỗ trợ file PDF, DOCX, TXT
+- [x] Tạo flashcard tự động với AI
+- [x] Theo dõi tiến độ học tập
+- [ ] Xuất flashcard ra file
+- [ ] Hỗ trợ nhiều ngôn ngữ
+- [ ] API cho ứng dụng mobile
+
+Xem [open issues](https://github.com/ngcvien/ai_flashcard_generator/issues) để biết danh sách đầy đủ các tính năng đề xuất và các vấn đề đã biết.
+
+## 🤝 Đóng góp
+
+Mọi đóng góp đều được hoan nghênh và rất có giá trị. Nếu bạn có đề xuất để cải thiện dự án:
 
 1. Fork dự án
-2. Tạo branch mới (`git checkout -b feature/AmazingFeature`)
-3. Commit thay đổi (`git commit -m 'Add some AmazingFeature'`)
+2. Tạo branch cho tính năng của bạn (`git checkout -b feature/AmazingFeature`)
+3. Commit các thay đổi (`git commit -m 'Add some AmazingFeature'`)
 4. Push lên branch (`git push origin feature/AmazingFeature`)
 5. Mở Pull Request
 
-## Bảo mật
+## 📝 License
 
-- Không bao giờ commit file `.env` lên repository
+Được phân phối theo giấy phép MIT. Xem `LICENSE` để biết thêm thông tin.
+
+## 🔒 Bảo mật
+
+- KHÔNG BAO GIỜ commit file `.env` lên repository
 - Bảo vệ API key của bạn
-- Thường xuyên kiểm tra và cập nhật các dependencies
+- Thường xuyên cập nhật các dependencies
+- Backup dữ liệu trong thư mục `data/` định kỳ
+
+## 📧 Liên hệ
+
+Your Name - [@your_twitter](https://twitter.com/your_twitter) - email@example.com
+
+Project Link: [https://github.com/ngcvien/ai_flashcard_generator](https://github.com/ngcvien/ai_flashcard_generator)
