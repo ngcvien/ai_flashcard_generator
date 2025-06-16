@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="card-title text-center mb-4">{{ data.title }} - Chế độ Kiểm tra</h1>
+                    
+                    <!-- Quiz Start Screen -->
+                    <div id="startScreen" class="text-center">
+                        <p class="lead mb-4">Chế độ kiểm tra gồm 15 câu hỏi trắc nghiệm. Mỗi câu hỏi có 4 đáp án để lựa chọn.</p>
+                        <button type="button" id="startQuiz" class="btn btn-primary btn-lg">
+                            Tạo bài kiểm tra bằng AI
+                        </button>
+                    </div>
+
+                    <!-- Quiz Content -->
+                    <div id="quizContent" class="d-none">
+                        <div class="progress mb-4">
+                            <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+
+                        <div id="questionContainer">
+                            <h3 id="questionText" class="mb-4"></h3>
+                            <div id="answersContainer" class="list-group mb-4">
+                                <!-- Answers will be inserted here -->
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button id="prevBtn" class="btn btn-outline-primary" disabled>
+                                <i class="fas fa-arrow-left"></i> Câu trước
+                            </button>
+                            <button id="nextBtn" class="btn btn-outline-primary">
+                                Câu tiếp <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Results Screen -->
+                    <div id="resultsScreen" class="d-none">
+                        <div class="text-center mb-4">
+                            <h2>Kết quả kiểm tra</h2>
+                            <div class="display-4 mb-3">
+                                <span id="score">0</span>/15
+                            </div>
+                            <div id="scoreMessage" class="lead mb-4"></div>
+                        </div>
+
+                        <div id="analysisContainer" class="mb-4">
+                            <h3 class="mb-3">Phân tích kết quả</h3>
+                            <div id="analysisContent" class="p-3 bg-light rounded">
+                                <div class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button id="restartQuiz" class="btn btn-primary">
+                                Làm lại bài kiểm tra
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fireworks Canvas -->
+<canvas id="fireworks" class="position-fixed top-0 start-0 w-100 h-100" style="pointer-events: none; z-index: 9999;"></canvas>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing quiz...');
+    
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let userAnswers = [];
+    let score = 0;
+
+    // Khởi tạo bài kiểm tra
+    const startButton = document.getElementById('startQuiz');
+    if (startButton) {
+        console.log('Start button found, adding click listener...');
+        startButton.onclick = async function() {
+            console.log('Start button clicked');
+            const startScreen = document.getElementById('startScreen');
+            
+            try {
+                // Hiển thị trạng thái loading
+                startButton.disabled = true;
+                startButton.innerHTML = `
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Đang tạo bài kiểm tra...
+                `;
+                
+                console.log('Sending request to generate quiz...');
+                const formData = new FormData();
+                formData.append('action', 'generate');
+                
+                const response = await fetch(`/quiz/{{ data.id }}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('Response received:', response);
+                const data = await response.json();
+                console.log('Data parsed:', data);
+                
+                if (data.success) {
+                    questions = data.questions;
+                    if (questions.length === 0) {
+                        throw new Error('Không thể tạo câu hỏi cho bài kiểm tra');
+                    }
+                    
+                    userAnswers = new Array(questions.length).fill(null);
+                    
+                    // Hiển thị giao diện bài kiểm tra
+                    startScreen.classList.add('d-none');
+                    document.getElementById('quizContent').classList.remove('d-none');
+                    
+                    // Hiển thị câu hỏi đầu tiên
+                    showQuestion(0);
+                } else {
+                    throw new Error(data.error || 'Có lỗi xảy ra khi tạo bài kiểm tra');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // Hiển thị thông báo lỗi
+                startScreen.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Có lỗi xảy ra!</h4>
+                        <p>${error.message}</p>
+                        <hr>
+                        <button class="btn btn-primary" onclick="location.reload()">
+                            Thử lại
+                        </button>
+                    </div>
+                `;
+            } finally {
+                // Reset trạng thái nút
+                startButton.disabled = false;
+                startButton.innerHTML = 'Bắt đầu kiểm tra';
+            }
+        };
+    } else {
+        console.error('Start button not found!');
+    }
+
+    // Hiển thị câu hỏi
+    function showQuestion(index) {
+        console.log('Showing question:', index);
+        const question = questions[index];
+        document.getElementById('questionText').textContent = `Câu ${index + 1}: ${question.question}`;
+        
+        const answersContainer = document.getElementById('answersContainer');
+        answersContainer.innerHTML = '';
+        
+        question.answers.forEach((answer, i) => {
+            const button = document.createElement('button');
+            button.className = `list-group-item list-group-item-action ${userAnswers[index] === i ? 'active' : ''}`;
+            button.textContent = answer;
+            button.addEventListener('click', () => selectAnswer(i));
+            answersContainer.appendChild(button);
+        });
+        
+        // Cập nhật nút điều hướng
+        document.getElementById('prevBtn').disabled = index === 0;
+        document.getElementById('nextBtn').textContent = index === questions.length - 1 ? 'Kết thúc' : 'Câu tiếp';
+        
+        // Cập nhật thanh tiến trình
+        const progress = ((index + 1) / questions.length) * 100;
+        document.getElementById('progressBar').style.width = `${progress}%`;
+    }
+
+    // Chọn đáp án
+    function selectAnswer(answerIndex) {
+        console.log('Answer selected:', answerIndex);
+        userAnswers[currentQuestionIndex] = answerIndex;
+        showQuestion(currentQuestionIndex);
+    }
+
+    // Xử lý nút điều hướng
+    document.getElementById('prevBtn').addEventListener('click', () => {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            showQuestion(currentQuestionIndex);
+        }
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            showQuestion(currentQuestionIndex);
+        } else {
+            showResults();
+        }
+    });
+
+    // Hiển thị kết quả
+    async function showResults() {
+        console.log('Showing results...');
+        // Tính điểm
+        score = questions.reduce((total, question, index) => {
+            return total + (userAnswers[index] === question.correct_index ? 1 : 0);
+        }, 0);
+        
+        // Hiển thị màn hình kết quả
+        document.getElementById('quizContent').classList.add('d-none');
+        document.getElementById('resultsScreen').classList.remove('d-none');
+        
+        // Hiển thị điểm số
+        document.getElementById('score').textContent = score;
+        
+        // Hiển thị thông báo
+        const scoreMessage = document.getElementById('scoreMessage');
+        if (score >= 12) {
+            scoreMessage.textContent = 'Chúc mừng! Bạn đã hoàn thành xuất sắc!';
+            scoreMessage.className = 'lead mb-4 text-success';
+            showFireworks();
+        } else if (score >= 8) {
+            scoreMessage.textContent = 'Khá tốt! Hãy tiếp tục cố gắng!';
+            scoreMessage.className = 'lead mb-4 text-primary';
+        } else {
+            scoreMessage.textContent = 'Cần cố gắng thêm!';
+            scoreMessage.className = 'lead mb-4 text-warning';
+        }
+        
+        // Hiển thị danh sách câu hỏi và kết quả
+        const analysisContent = document.getElementById('analysisContent');
+        let resultsHtml = '<div class="results-list">';
+        
+        questions.forEach((question, index) => {
+            const isCorrect = userAnswers[index] === question.correct_index;
+            const userAnswer = userAnswers[index] !== null ? question.answers[userAnswers[index]] : 'Không trả lời';
+            const correctAnswer = question.answers[question.correct_index];
+            
+            resultsHtml += `
+                <div class="card mb-3 ${isCorrect ? 'border-success' : 'border-danger'}">
+                    <div class="card-header ${isCorrect ? 'bg-success text-white' : 'bg-danger text-white'}">
+                        <strong>Câu ${index + 1}</strong> - ${isCorrect ? 'Đúng' : 'Sai'}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">${question.question}</h5>
+                        <div class="mt-3">
+                            <p class="mb-1"><strong>Đáp án của bạn:</strong> ${userAnswer}</p>
+                            ${!isCorrect ? `<p class="mb-1"><strong>Đáp án đúng:</strong> ${correctAnswer}</p>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        resultsHtml += '</div>';
+        analysisContent.innerHTML = resultsHtml;
+    }
+
+    // Hiệu ứng pháo hoa
+    function showFireworks() {
+        console.log('Showing fireworks...');
+        const duration = 3 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+        function randomInRange(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        const interval = setInterval(function() {
+            const timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+
+            const particleCount = 50 * (timeLeft / duration);
+            
+            // Pháo hoa từ trái
+            confetti({
+                ...defaults,
+                particleCount,
+                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+            });
+            
+            // Pháo hoa từ phải
+            confetti({
+                ...defaults,
+                particleCount,
+                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+            });
+        }, 250);
+    }
+
+    // Làm lại bài kiểm tra
+    document.getElementById('restartQuiz').addEventListener('click', () => {
+        console.log('Restarting quiz...');
+        currentQuestionIndex = 0;
+        userAnswers = new Array(questions.length).fill(null);
+        document.getElementById('resultsScreen').classList.add('d-none');
+        document.getElementById('quizContent').classList.remove('d-none');
+        showQuestion(0);
+    });
+});
+</script>
+{% endblock %} 

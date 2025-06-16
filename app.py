@@ -9,6 +9,7 @@ import google.generativeai as genai
 from werkzeug.utils import secure_filename
 import re
 from dotenv import load_dotenv
+import random
 
 # Load environment variables from .env file
 load_dotenv()
@@ -403,6 +404,170 @@ def explain_question(flashcard_id, card_index):
     except Exception as e:
         print(f"Lỗi khi tạo giải thích: {e}")
         return jsonify({'error': 'Không thể tạo giải thích'}), 500
+
+@app.route('/quiz/<flashcard_id>', methods=['GET', 'POST'])
+def quiz_mode(flashcard_id):
+    data = load_flashcard_set(flashcard_id)
+    if not data:
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        action = request.form.get('action')
+        
+        if action == 'generate':
+            try:
+                # Chọn ngẫu nhiên 15 câu hỏi
+                selected_cards = random.sample(data['flashcards'], min(15, len(data['flashcards'])))
+                print(f"Đã chọn {len(selected_cards)} câu hỏi")
+                
+                # Tạo các đáp án sai cho mỗi câu hỏi
+                quiz_questions = []
+                for i, card in enumerate(selected_cards):
+                    try:
+                        # print(f"\nXử lý câu hỏi {i + 1}:")
+                        # print(f"Câu hỏi: {card['question']}")
+                        # print(f"Đáp án đúng: {card['answer']}")
+                        
+                        prompt = f"""
+                        Tạo 3 đáp án sai cho câu hỏi sau:
+                        Câu hỏi: {card['question']}
+                        Đáp án đúng: {card['answer']}
+                        
+                        Yêu cầu:
+                        1. Các đáp án sai phải có vẻ hợp lý
+                        2. Không quá dễ nhận biết là sai
+                        3. Có liên quan đến chủ đề của câu hỏi
+                        4. Độ dài tương đương với đáp án đúng
+                        
+                        Chỉ trả về 3 đáp án sai, mỗi đáp án trên một dòng, không có ký tự đánh dấu hay định dạng đặc biệt.
+                        """
+                        
+                        response = model.generate_content(prompt)
+                        # print(f"Response từ Gemini: {response.text}")
+                        
+                        # Xử lý response để lấy 3 đáp án sai
+                        response_text = response.text.strip()
+                        # print(f"Response text sau khi strip: {response_text}")
+                        
+                        # Tách response thành các dòng và lọc
+                        lines = [line.strip() for line in response_text.split('\n') if line.strip()]
+                        # print(f"Các dòng sau khi tách: {lines}")
+                        
+                        # Lấy 3 đáp án đầu tiên
+                        wrong_answers = lines[:3]
+                        # print(f"3 đáp án sai: {wrong_answers}")
+                        
+                        # Nếu không đủ 3 đáp án, tạo thêm
+                        while len(wrong_answers) < 3:
+                            wrong_answers.append(f"Đáp án sai {len(wrong_answers) + 1}")
+                        
+                        # Tạo danh sách đáp án và xáo trộn
+                        answers = [card['answer']] + wrong_answers
+                        random.shuffle(answers)
+                        
+                        quiz_questions.append({
+                            'question': card['question'],
+                            'answers': answers,
+                            'correct_index': answers.index(card['answer'])
+                        })
+                        print(f"Đã thêm câu hỏi {i + 1} vào bài kiểm tra")
+                        
+                    except Exception as e:
+                        print(f"Lỗi khi tạo đáp án sai cho câu hỏi {i + 1}: {str(e)}")
+                        print(f"Response gây lỗi: {response.text if 'response' in locals() else 'Không có response'}")
+                        
+                        # Tạo đáp án sai mặc định nếu có lỗi
+                        wrong_answers = [
+                            f"Đáp án sai 1 cho câu hỏi {i + 1}",
+                            f"Đáp án sai 2 cho câu hỏi {i + 1}",
+                            f"Đáp án sai 3 cho câu hỏi {i + 1}"
+                        ]
+                        answers = [card['answer']] + wrong_answers
+                        random.shuffle(answers)
+                        
+                        quiz_questions.append({
+                            'question': card['question'],
+                            'answers': answers,
+                            'correct_index': answers.index(card['answer'])
+                        })
+                        print(f"Đã thêm câu hỏi {i + 1} với đáp án mặc định")
+                        continue
+                
+                print(f"\nTổng số câu hỏi đã tạo: {len(quiz_questions)}")
+                return jsonify({
+                    'success': True,
+                    'questions': quiz_questions
+                })
+            except Exception as e:
+                print(f"Lỗi khi tạo bài kiểm tra: {str(e)}")
+                return jsonify({'error': 'Không thể tạo bài kiểm tra'}), 500
+            
+        elif action == 'analyze':
+            if not wrong_questions:
+                return jsonify({'success': False, 'error': 'Không có câu hỏi sai để phân tích'})
+            
+            print(f"Analyzing {len(wrong_questions)} wrong questions")
+            for q in wrong_questions:
+                print(f"Question: {q['question']}")
+                print(f"Correct: {q['correct_answer']}")
+                print(f"User answer: {q['user_answer']}")
+            
+            # Tạo prompt cho phân tích
+            wrong_questions_json = json.dumps(wrong_questions, ensure_ascii=False, indent=2)
+            analysis_prompt = (
+                "Hãy phân tích chi tiết các câu trả lời sai sau đây và đưa ra gợi ý học tập:\n\n"
+                + wrong_questions_json + "\n\n"
+                "Hãy phân tích theo các điểm sau:\n"
+                "1. Những điểm yếu chung trong cách trả lời\n"
+                "2. Gợi ý học tập cụ thể\n"
+                "3. Các chủ đề cần ôn tập lại\n"
+                "4. Lời khuyên để cải thiện\n\n"
+                "Lưu ý: \n"
+                "- Trả về kết quả dưới dạng text thuần túy, KHÔNG sử dụng markdown hoặc HTML\n"
+                "- Mỗi phần phân tích nên có tiêu đề rõ ràng\n"
+                "- Sử dụng ngôn ngữ dễ hiểu và khuyến khích"
+            )
+            
+            try:
+                print("Sending analysis request to Gemini...")
+                response = model.generate_content(analysis_prompt)
+                print("Raw response from Gemini:", response.text)
+                
+                # Xử lý response để đảm bảo là text thuần túy
+                analysis = response.text
+                
+                # Loại bỏ các ký tự markdown và HTML nếu có
+                analysis = analysis.replace('```', '').replace('```html', '').replace('```text', '')
+                analysis = re.sub(r'<[^>]+>', '', analysis)  # Loại bỏ HTML tags
+                
+                # Chuyển đổi text thành HTML với định dạng Bootstrap
+                analysis_html = (
+                    '<div class="analysis-content">\n'
+                    + analysis.replace('\n', '<br>') +
+                    '\n</div>'
+                )
+                
+                print("Final analysis HTML:", analysis_html)
+                return jsonify({
+                    'success': True,
+                    'analysis': analysis_html
+                })
+                
+            except Exception as e:
+                print(f"Error analyzing results: {str(e)}")
+                print(f"Error type: {type(e)}")
+                print(f"Error details: {e.__dict__ if hasattr(e, '__dict__') else 'No details available'}")
+                return jsonify({
+                    'success': False,
+                    'error': f'Lỗi khi phân tích kết quả: {str(e)}'
+                })
+        
+        return jsonify({
+            'success': False,
+            'error': 'Invalid action'
+        })
+    
+    return render_template('quiz.html', data=data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
