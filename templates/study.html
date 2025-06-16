@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.title }} - AI Flashcard Generator{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3><i class="fas fa-graduation-cap"></i> {{ data.title }}</h3>
+                <div>
+                    <span class="badge bg-primary me-2">
+                        <span id="currentCard">1</span> / {{ data.flashcards|length }}
+                    </span>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="shuffleCards()">
+                        <i class="fas fa-shuffle"></i> Xáo trộn
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="flashcard mb-4" id="flashcard" onclick="flipCard()">
+                    <div class="flashcard-inner" id="flashcardInner">
+                        <div class="flashcard-front">
+                            <div>
+                                <h4 class="mb-3">Câu hỏi</h4>
+                                <p id="questionText" class="fs-5"></p>
+                                <small class="text-muted">Click để xem đáp án</small>
+                            </div>
+                        </div>
+                        <div class="flashcard-back">
+                            <div>
+                                <h4 class="mb-3">Đáp án</h4>
+                                <p id="answerText" class="fs-5"></p>
+                                <small>Click để quay lại câu hỏi</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <button class="btn btn-outline-primary" onclick="previousCard()" id="prevBtn">
+                        <i class="fas fa-chevron-left"></i> Trước
+                    </button>
+                    
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-success" onclick="markCard('easy')">
+                            <i class="fas fa-smile"></i> Dễ
+                        </button>
+                        <button class="btn btn-warning" onclick="markCard('medium')">
+                            <i class="fas fa-meh"></i> Trung bình  
+                        </button>
+                        <button class="btn btn-danger" onclick="markCard('hard')">
+                            <i class="fas fa-frown"></i> Khó
+                        </button>
+                    </div>
+                    
+                    <button class="btn btn-outline-primary" onclick="nextCard()" id="nextBtn">
+                        Tiếp <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="progress mb-4">
+                    <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-bar"></i> Thống kê</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="text-success">
+                                    <i class="fas fa-smile fa-2x"></i>
+                                    <p class="mb-0 mt-2"><span id="easyCount">0</span></p>
+                                    <small>Dễ</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-warning">
+                                    <i class="fas fa-meh fa-2x"></i>
+                                    <p class="mb-0 mt-2"><span id="mediumCount">0</span></p>
+                                    <small>TB</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-danger">
+                                    <i class="fas fa-frown fa-2x"></i>
+                                    <p class="mb-0 mt-2"><span id="hardCount">0</span></p>
+                                    <small>Khó</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-info btn-sm" onclick="reviewDifficult()">
+                                <i class="fas fa-redo"></i> Ôn lại thẻ khó
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="resetProgress()">
+                                <i class="fas fa-refresh"></i> Bắt đầu lại
+                            </button>
+                            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-home"></i> Về trang chủ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6><i class="fas fa-keyboard"></i> Phím tắt</h6>
+                    </div>
+                    <div class="card-body">
+                        <small>
+                            <kbd>Space</kbd> Lật thẻ<br>
+                            <kbd>←</kbd> Thẻ trước<br>
+                            <kbd>→</kbd> Thẻ tiếp theo<br>
+                            <kbd>1</kbd> Đánh dấu dễ<br>
+                            <kbd>2</kbd> Đánh dấu TB<br>
+                            <kbd>3</kbd> Đánh dấu khó
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal hoàn thành -->
+<div class="modal fade" id="completionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-trophy text-warning"></i> Chúc mừng!</h5>
+            </div>
+            <div class="modal-body text-center">
+                <h4>Bạn đã hoàn thành bộ flashcard!</h4>
+                <div class="row mt-3">
+                    <div class="col-4">
+                        <div class="text-success">
+                            <i class="fas fa-smile fa-2x"></i>
+                            <p class="mb-0 mt-2"><span id="finalEasy">0</span> thẻ</p>
+                            <small>Dễ</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-warning">
+                            <i class="fas fa-meh fa-2x"></i>
+                            <p class="mb-0 mt-2"><span id="finalMedium">0</span> thẻ</p>
+                            <small>Trung bình</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-danger">
+                            <i class="fas fa-frown fa-2x"></i>
+                            <p class="mb-0 mt-2"><span id="finalHard">0</span> thẻ</p>
+                            <small>Khó</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" onclick="reviewDifficult()">
+                    <i class="fas fa-redo"></i> Ôn lại thẻ khó
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="resetProgress()">
+                    <i class="fas fa-refresh"></i> Học lại
+                </button>
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Về trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Dữ liệu flashcard từ server
+const flashcards = {{ data.flashcards | tojson | safe }};
+let currentIndex = 0;
+let isFlipped = false;
+let cardStats = {
+    easy: 0,
+    medium: 0,
+    hard: 0
+};
+let reviewedCards = new Set();
+let difficultCards = [];
+
+// Khởi tạo
+document.addEventListener('DOMContentLoaded', function() {
+    displayCard();
+    updateProgress();
+    updateStats();
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        switch(e.code) {
+            case 'Space':
+                e.preventDefault();
+                flipCard();
+                break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                previousCard();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                nextCard();
+                break;
+            case 'Digit1':
+                e.preventDefault();
+                markCard('easy');
+                break;
+            case 'Digit2':
+                e.preventDefault();
+                markCard('medium');
+                break;
+            case 'Digit3':
+                e.preventDefault();
+                markCard('hard');
+                break;
+        }
+    });
+});
+
+function displayCard() {
+    if (flashcards.length === 0) return;
+    
+    const card = flashcards[currentIndex];
+    document.getElementById('questionText').textContent = card.question;
+    document.getElementById('answerText').textContent = card.answer;
+    document.getElementById('currentCard').textContent = currentIndex + 1;
+    
+    // Reset flip state
+    if (isFlipped) {
+        flipCard();
+    }
+    
+    // Update navigation buttons
+    document.getElementById('prevBtn').disabled = currentIndex === 0;
+    document.getElementById('nextBtn').disabled = currentIndex === flashcards.length - 1;
+}
+
+function flipCard() {
+    const flashcard = document.getElementById('flashcard');
+    flashcard.classList.toggle('flipped');
+    isFlipped = !isFlipped;
+}
+
+function nextCard() {
+    if (currentIndex < flashcards.length - 1) {
+        currentIndex++;
+        displayCard();
+        updateProgress();
+    } else {
+        // Hoàn thành tất cả thẻ
+        showCompletionModal();
+    }
+}
+
+function previousCard() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        displayCard();
+        updateProgress();
+    }
+}
+
+function markCard(difficulty) {
+    const cardId = currentIndex;
+    
+    // Xóa đánh giá cũ nếu có
+    if (reviewedCards.has(cardId)) {
+        const oldDifficulty = flashcards[cardId].difficulty;
+        if (oldDifficulty) {
+            cardStats[oldDifficulty]--;
+        }
+    }
+    
+    // Thêm đánh giá mới
+    flashcards[cardId].difficulty = difficulty;
+    cardStats[difficulty]++;
+    reviewedCards.add(cardId);
+    
+    // Thêm vào danh sách thẻ khó nếu cần
+    if (difficulty === 'hard' && !difficultCards.includes(cardId)) {
+        difficultCards.push(cardId);
+    } else if (difficulty !== 'hard') {
+        difficultCards = difficultCards.filter(id => id !== cardId);
+    }
+    
+    updateStats();
+    
+    // Tự động chuyển sang thẻ tiếp theo
+    setTimeout(() => {
+        nextCard();
+    }, 500);
+}
+
+function updateProgress() {
+    const progress = ((currentIndex + 1) / flashcards.length) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+}
+
+function updateStats() {
+    document.getElementById('easyCount').textContent = cardStats.easy;
+    document.getElementById('mediumCount').textContent = cardStats.medium;
+    document.getElementById('hardCount').textContent = cardStats.hard;
+}
+
+function shuffleCards() {
+    // Fisher-Yates shuffle
+    for (let i = flashcards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+    }
+    
+    currentIndex = 0;
+    displayCard();
+    updateProgress();
+}
+
+function reviewDifficult() {
+    if (difficultCards.length === 0) {
+        alert('Không có thẻ nào được đánh dấu khó!');
+        return;
+    }
+    
+    // Tạo mảng chỉ chứa thẻ khó
+    const difficultFlashcards = difficultCards.map(id => flashcards[id]);
+    
+    // Thay thế mảng hiện tại
+    flashcards.length = 0;
+    flashcards.push(...difficultFlashcards);
+    
+    currentIndex = 0;
+    displayCard();
+    updateProgress();
+    
+    // Đóng modal nếu đang mở
+    const modal = bootstrap.Modal.getInstance(document.getElementById('completionModal'));
+    if (modal) {
+        modal.hide();
+    }
+}
+
+function resetProgress() {
+    // Reset tất cả stats
+    cardStats = { easy: 0, medium: 0, hard: 0 };
+    reviewedCards.clear();
+    difficultCards = [];
+    
+    // Xóa difficulty từ tất cả thẻ
+    flashcards.forEach(card => {
+        delete card.difficulty;
+    });
+    
+    currentIndex = 0;
+    displayCard();
+    updateProgress();
+    updateStats();
+    
+    // Đóng modal nếu đang mở
+    const modal = bootstrap.Modal.getInstance(document.getElementById('completionModal'));
+    if (modal) {
+        modal.hide();
+    }
+}
+
+function showCompletionModal() {
+    document.getElementById('finalEasy').textContent = cardStats.easy;
+    document.getElementById('finalMedium').textContent = cardStats.medium;
+    document.getElementById('finalHard').textContent = cardStats.hard;
+    
+    const modal = new bootstrap.Modal(document.getElementById('completionModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}Tạo flashcard thủ công - AI Flashcard Generator{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-plus"></i> Tạo flashcard thủ công</h3>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> {{ error }}
+                </div>
+                {% endif %}
+                
+                <form method="POST" id="createForm">
+                    <div class="mb-4">
+                        <label for="title" class="form-label">Tiêu đề bộ flashcard</label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               placeholder="Nhập tiêu đề cho bộ flashcard" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <label class="form-label">Danh sách flashcard</label>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="addCard()">
+                                <i class="fas fa-plus"></i> Thêm thẻ
+                            </button>
+                        </div>
+                        
+                        <div id="flashcardsList">
+                            <!-- Thẻ mặc định -->
+                            <div class="card mb-3 flashcard-item">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title mb-0">Thẻ #1</h6>
+                                        <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                onclick="removeCard(this)" disabled>
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label small">Câu hỏi</label>
+                                            <textarea class="form-control question-input" rows="3" 
+                                                    placeholder="Nhập câu hỏi..." required></textarea>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label small">Đáp án</label>
+                                            <textarea class="form-control answer-input" rows="3" 
+                                                    placeholder="Nhập đáp án..." required></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="flashcards" id="flashcardsData">
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save"></i> Tạo bộ flashcard
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5><i class="fas fa-lightbulb text-warning"></i> Mẹo tạo flashcard hiệu quả:</h5>
+                <ul class="mb-0">
+                    <li><strong>Câu hỏi ngắn gọn:</strong> Đặt câu hỏi rõ ràng, dễ hiểu</li>
+                    <li><strong>Đáp án chính xác:</strong> Đưa ra câu trả lời chính xác và đầy đủ</li>
+                    <li><strong>Một khái niệm một thẻ:</strong> Mỗi thẻ chỉ nên tập trung vào một khái niệm</li>
+                    <li><strong>Sử dụng ví dụ:</strong> Thêm ví dụ cụ thể để dễ nhớ hơn</li>
+                    <li><strong>Kiểm tra chính tả:</strong> Đảm bảo không có lỗi chính tả</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let cardCount = 1;
+
+function addCard() {
+    cardCount++;
+    const flashcardsList = document.getElementById('flashcardsList');
+    
+    const cardHtml = `
+        <div class="card mb-3 flashcard-item">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="card-title mb-0">Thẻ #${cardCount}</h6>
+                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeCard(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label small">Câu hỏi</label>
+                        <textarea class="form-control question-input" rows="3" 
+                                placeholder="Nhập câu hỏi..." required></textarea>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label small">Đáp án</label>
+                        <textarea class="form-control answer-input" rows="3" 
+                                placeholder="Nhập đáp án..." required></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    flashcardsList.insertAdjacentHTML('beforeend', cardHtml);
+    updateCardNumbers();
+    updateRemoveButtons();
+}
+
+function removeCard(button) {
+    const cardItem = button.closest('.flashcard-item');
+    cardItem.remove();
+    updateCardNumbers();
+    updateRemoveButtons();
+}
+
+function updateCardNumbers() {
+    const cardItems = document.querySelectorAll('.flashcard-item');
+    cardItems.forEach((item, index) => {
+        const title = item.querySelector('.card-title');
+        title.textContent = `Thẻ #${index + 1}`;
+    });
+    cardCount = cardItems.length;
+}
+
+function updateRemoveButtons() {
+    const removeButtons = document.querySelectorAll('.flashcard-item .btn-outline-danger');
+    const hasMultipleCards = removeButtons.length > 1;
+    
+    removeButtons.forEach(button => {
+        button.disabled = !hasMultipleCards;
+    });
+}
+
+// Form submit
+document.getElementById('createForm').addEventListener('submit', function(e) {
+    const flashcards = [];
+    const cardItems = document.querySelectorAll('.flashcard-item');
+    
+    let isValid = true;
+    
+    cardItems.forEach((item, index) => {
+        const question = item.querySelector('.question-input').value.trim();
+        const answer = item.querySelector('.answer-input').value.trim();
+        
+        if (!question || !answer) {
+            isValid = false;
+            // Highlight empty fields
+            if (!question) {
+                item.querySelector('.question-input').classList.add('is-invalid');
+            } else {
+                item.querySelector('.question-input').classList.remove('is-invalid');
+            }
+            
+            if (!answer) {
+                item.querySelector('.answer-input').classList.add('is-invalid');
+            } else {
+                item.querySelector('.answer-input').classList.remove('is-invalid');
+            }
+        } else {
+            item.querySelector('.question-input').classList.remove('is-invalid');
+            item.querySelector('.answer-input').classList.remove('is-invalid');
+            
+            flashcards.push({
+                question: question,
+                answer: answer
+            });
+        }
+    });
+    
+    if (!isValid) {
+        e.preventDefault();
+        alert('Vui lòng điền đầy đủ câu hỏi và đáp án cho tất cả các thẻ!');
+        return;
+    }
+    
+    if (flashcards.length === 0) {
+        e.preventDefault();
+        alert('Vui lòng tạo ít nhất một thẻ flashcard!');
+        return;
+    }
+    
+    // Chuyển dữ liệu flashcards thành JSON
+    document.getElementById('flashcardsData').value = JSON.stringify(flashcards);
+});
+
+// Auto-resize textareas
+document.addEventListener('input', function(e) {
+    if (e.target.tagName === 'TEXTAREA') {
+        e.target.style.height = 'auto';
+        e.target.style.height = e.target.scrollHeight + 'px';
+    }
+});
+
+// Real-time validation
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('question-input') || e.target.classList.contains('answer-input')) {
+        if (e.target.value.trim()) {
+            e.target.classList.remove('is-invalid');
+            e.target.classList.add('is-valid');
+        } else {
+            e.target.classList.remove('is-valid');
+        }
+    }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addCard();
+        }
+    }
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    updateRemoveButtons();
+});
+</script>
+{% endblock %}

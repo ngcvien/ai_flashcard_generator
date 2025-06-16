@@ -1,0 +1,143 @@
+{
+  "id": "29d97d4c-2e90-4de9-9ff3-53a548f3b4ba",
+  "title": "Flashcard từ Lý thuyết mạch khuếch đại",
+  "created_at": "2025-06-16T17:03:30.824056",
+  "flashcards": [
+    {
+      "question": "Transistor lưỡng cực (BJT) là gì?",
+      "answer": "Transistor lưỡng cực (BJT) là một linh kiện bán dẫn được tạo thành từ ba lớp bán dẫn pha tạp khác nhau, tạo ra hai tiếp giáp P-N. Có hai loại BJT: NPN và PNP."
+    },
+    {
+      "question": "Mô tả cấu trúc của một transistor NPN.",
+      "answer": "Một transistor NPN gồm hai lớp bán dẫn loại N kẹp một lớp bán dẫn loại P ở giữa. Ba lớp này tương ứng với ba cực: Emitter (E), Base (B), và Collector (C)."
+    },
+    {
+      "question": "Nguyên lý hoạt động cơ bản của BJT là gì?",
+      "answer": "Nguyên lý hoạt động cơ bản của BJT dựa trên việc dùng một dòng điện nhỏ ở cực Base (IB) để điều khiển một dòng điện lớn hơn nhiều chạy giữa cực Collector và Emitter (IC). Dòng IB nhỏ điều khiển dòng IC lớn hơn nhiều (gấp β lần, với β là hệ số khuếch đại dòng điện)."
+    },
+    {
+      "question": "Mạch khuếch đại Emitter chung (Common Emitter - CE) là gì?",
+      "answer": "Mạch khuếch đại Emitter chung là cấu hình mà tín hiệu xoay chiều (AC) được đưa vào cực Base và tín hiệu ra được lấy ở cực Collector, trong khi cực Emitter được nối chung (thường qua một tụ nối đất cho tín hiệu AC)."
+    },
+    {
+      "question": "Giải thích nguyên lý hoạt động của mạch khuếch đại Emitter chung.",
+      "answer": "Một tín hiệu AC nhỏ ở ngõ vào làm thay đổi điện áp Base-Emitter, dẫn đến sự thay đổi tương ứng của dòng Base (IB). Sự thay đổi nhỏ này trong IB được transistor khuếch đại thành một sự thay đổi lớn hơn nhiều trong dòng Collector (IC). Dòng IC biến thiên này khi đi qua điện trở tải ở Collector (RC) sẽ tạo ra một sụt áp biến thiên trên RC. Điện áp ở ngõ ra (tại Collector) là một phiên bản được khuếch đại và đảo pha 180 độ so với tín hiệu ở ngõ vào."
+    },
+    {
+      "question": "Vai trò của điện trở Rc trong mạch khuếch đại BJT là gì?",
+      "answer": "Vai trò chính của RC là chuyển đổi sự thay đổi của dòng điện Collector (IC) thành một tín hiệu điện áp ở ngõ ra. Khi IC thay đổi theo tín hiệu vào, sụt áp trên RC cũng thay đổi tương ứng, tạo ra một điện áp ra được khuếch đại. Giá trị của RC ảnh hưởng trực tiếp đến độ lợi khuếch đại áp của mạch."
+    },
+    {
+      "question": "Điện trở Re trong mạch khuếch đại BJT có tác dụng gì?",
+      "answer": "Điện trở Re giúp ổn định điểm làm việc của transistor, giảm biến thiên dòng collector do thay đổi nhiệt độ hoặc các yếu tố khác. Nó cũng ảnh hưởng đến độ lợi khuếch đại của mạch, thường làm giảm độ lợi nhưng tăng độ tuyến tính."
+    },
+    {
+      "question": "So sánh mạch khuếch đại Emitter chung và mạch khuếch đại Base chung.",
+      "answer": "Mạch khuếch đại Emitter chung có độ lợi cao hơn, đảo pha 180 độ, và trở kháng vào thấp, trở kháng ra cao. Mạch khuếch đại Base chung có độ lợi thấp hơn, không đảo pha, và trở kháng vào cao, trở kháng ra thấp."
+    },
+    {
+      "question": "Hệ số khuếch đại dòng điện β (beta) của BJT là gì?",
+      "answer": "Hệ số khuếch đại dòng điện β là tỷ số giữa dòng điện collector (IC) và dòng điện base (IB) trong vùng hoạt động tuyến tính của BJT. β cho biết khả năng khuếch đại dòng điện của transistor."
+    },
+    {
+      "question": "Tại sao mạch khuếch đại Emitter chung lại đảo pha tín hiệu?",
+      "answer": "Mạch khuếch đại Emitter chung đảo pha tín hiệu 180 độ vì sự thay đổi dòng collector (IC) gây ra sự thay đổi điện áp ngược pha trên điện trở collector (RC)."
+    },
+    {
+      "question": "Nêu một số ứng dụng của mạch khuếch đại BJT.",
+      "answer": "Mạch khuếch đại BJT được sử dụng rộng rãi trong nhiều ứng dụng như khuếch đại tín hiệu âm thanh, khuếch đại tín hiệu RF, mạch chuyển mạch, và nhiều ứng dụng điện tử khác."
+    },
+    {
+      "question": "Giải thích khái niệm điểm làm việc tĩnh (quiescent point) trong mạch khuếch đại BJT.",
+      "answer": "Điểm làm việc tĩnh là điểm hoạt động của transistor khi không có tín hiệu vào. Nó được xác định bởi các giá trị dòng điện và điện áp tĩnh trên transistor. Việc lựa chọn điểm làm việc tĩnh thích hợp rất quan trọng để đảm bảo hoạt động tuyến tính của mạch."
+    },
+    {
+      "question": "Làm thế nào để thay đổi độ lợi của mạch khuếch đại Emitter chung?",
+      "answer": "Độ lợi của mạch khuếch đại Emitter chung có thể được thay đổi bằng cách thay đổi giá trị của điện trở Rc, Re hoặc bằng cách sử dụng các linh kiện phản hồi."
+    },
+    {
+      "question": "Sự khác biệt chính giữa transistor NPN và PNP là gì?",
+      "answer": "Sự khác biệt chính nằm ở chiều dòng điện và điện áp phân cực. Trong transistor NPN, dòng điện chạy từ emitter (N) đến collector (N) và điện áp phân cực thuận cho base-emitter. Trong transistor PNP, dòng điện chạy từ emitter (P) đến collector (P) và điện áp phân cực thuận cho base-collector."
+    },
+    {
+      "question": "Mô tả vai trò của Base trong transistor BJT.",
+      "answer": "Cực Base đóng vai trò điều khiển dòng điện giữa Collector và Emitter. Một dòng điện nhỏ ở Base điều khiển một dòng điện lớn hơn nhiều ở Collector."
+    },
+    {
+      "question": "Tại sao cần phải phân cực transistor BJT trước khi sử dụng?",
+      "answer": "Phân cực transistor BJT thiết lập điểm hoạt động tĩnh của transistor để đảm bảo nó hoạt động trong vùng tuyến tính mong muốn. Không phân cực đúng cách có thể dẫn đến hoạt động không ổn định hoặc bị phá hủy."
+    },
+    {
+      "question": "Thế nào là vùng hoạt động bão hòa và vùng hoạt động ngắt của BJT?",
+      "answer": "Vùng bão hòa là khi transistor dẫn điện hoàn toàn, điện áp giữa collector-emitter rất nhỏ. Vùng ngắt là khi transistor không dẫn điện, dòng collector gần như bằng không."
+    },
+    {
+      "question": "Tụ điện ở mạch khuếch đại Emitter chung có tác dụng gì?",
+      "answer": "Tụ điện thường được dùng để ghép nối tín hiệu xoay chiều (AC) vào và ra khỏi mạch, ngăn tín hiệu một chiều (DC) ảnh hưởng đến hoạt động của mạch."
+    },
+    {
+      "question": "Phân tích ảnh hưởng của nhiệt độ đến hoạt động của BJT.",
+      "answer": "Nhiệt độ ảnh hưởng đến các tham số của BJT như β, dòng điện rò rỉ. Sự thay đổi nhiệt độ có thể làm thay đổi điểm làm việc tĩnh và ảnh hưởng đến độ lợi và ổn định của mạch. Cần có các biện pháp thiết kế để giảm thiểu ảnh hưởng của nhiệt độ."
+    },
+    {
+      "question": "Giải thích hiện tượng dẫn điện của BJT trong mạch khuếch đại.",
+      "answer": "Khi áp đặt điện áp phân cực thuận giữa Base-Emitter, các điện tử sẽ di chuyển từ Emitter sang Base. Một phần nhỏ điện tử sẽ kết hợp với lỗ trống ở Base, tạo ra dòng IB. Phần lớn điện tử còn lại sẽ tiếp tục chuyển đến Collector, tạo ra dòng IC lớn hơn nhiều so với IB."
+    },
+    {
+      "question": "So sánh ưu điểm và nhược điểm của mạch khuếch đại Emitter chung.",
+      "answer": "Ưu điểm: Độ lợi cao, trở kháng vào thấp, trở kháng ra cao. Nhược điểm: Đảo pha tín hiệu, dễ bị ảnh hưởng bởi nhiệt độ."
+    },
+    {
+      "question": "Mô tả cách xác định điểm làm việc tĩnh trong mạch khuếch đại BJT.",
+      "answer": "Điểm làm việc tĩnh được xác định bằng cách tính toán dòng điện collector (IC) và điện áp collector-emitter (VCE) dựa trên các giá trị điện trở và điện áp phân cực."
+    },
+    {
+      "question": "Nếu β của transistor thay đổi, ảnh hưởng như thế nào đến điểm làm việc tĩnh?",
+      "answer": "Sự thay đổi β sẽ làm thay đổi dòng điện collector (IC) và do đó ảnh hưởng đến điểm làm việc tĩnh. Để giảm thiểu ảnh hưởng này, có thể sử dụng các kỹ thuật thiết kế như thêm điện trở emitter (Re)."
+    },
+    {
+      "question": "Giải thích khái niệm độ lợi điện áp và độ lợi dòng điện trong mạch khuếch đại BJT.",
+      "answer": "Độ lợi điện áp (Av) là tỷ số giữa biên độ điện áp ra và biên độ điện áp vào. Độ lợi dòng điện (Ai) là tỷ số giữa biên độ dòng điện ra và biên độ dòng điện vào."
+    },
+    {
+      "question": "Làm thế nào để thiết kế mạch khuếch đại BJT có độ lợi nhất định?",
+      "answer": "Việc thiết kế mạch khuếch đại BJT có độ lợi nhất định cần tính toán chính xác giá trị của điện trở Rc, Re, và chọn transistor có các thông số phù hợp."
+    },
+    {
+      "question": "Nêu các yếu tố ảnh hưởng đến độ lợi của mạch khuếch đại BJT.",
+      "answer": "Các yếu tố ảnh hưởng đến độ lợi bao gồm giá trị của điện trở Rc và Re, đặc tính của transistor (β), tần số tín hiệu, và các thành phần phản hồi."
+    },
+    {
+      "question": "Trình bày cách phân tích mạch khuếch đại BJT bằng phương pháp điểm làm việc tĩnh.",
+      "answer": "Phương pháp điểm làm việc tĩnh phân tích mạch bằng cách xác định dòng điện và điện áp tĩnh trên các thành phần của mạch, từ đó tính toán độ lợi và các thông số khác."
+    },
+    {
+      "question": "So sánh giữa mạch khuếch đại BJT và mạch khuếch đại Op-amp.",
+      "answer": "Mạch khuếch đại BJT có độ lợi cao hơn, tần số làm việc rộng hơn, nhưng phức tạp hơn trong thiết kế và dễ bị ảnh hưởng bởi nhiệt độ hơn so với mạch khuếch đại Op-amp."
+    },
+    {
+      "question": "Nếu mạch khuếch đại BJT bị méo hài, nguyên nhân có thể là gì?",
+      "answer": "Nguyên nhân có thể do điểm làm việc tĩnh không thích hợp, tín hiệu vào quá lớn, hoặc transistor hoạt động ngoài vùng tuyến tính."
+    },
+    {
+      "question": "Làm thế nào để giảm thiểu méo hài trong mạch khuếch đại BJT?",
+      "answer": "Có thể giảm thiểu méo hài bằng cách chọn điểm làm việc tĩnh thích hợp, giới hạn biên độ tín hiệu vào, và sử dụng các kỹ thuật bù trừ méo hài."
+    },
+    {
+      "question": "Giải thích khái niệm phản hồi âm trong mạch khuếch đại BJT.",
+      "answer": "Phản hồi âm là một phần tín hiệu ra được đưa trở lại ngõ vào với pha ngược, giúp ổn định điểm làm việc, giảm méo hài và tăng độ tuyến tính của mạch."
+    },
+    {
+      "question": "Ứng dụng của mạch khuếch đại BJT trong các hệ thống điều khiển là gì?",
+      "answer": "Mạch khuếch đại BJT được sử dụng rộng rãi trong các hệ thống điều khiển như bộ khuếch đại công suất, bộ khuếch đại điều khiển động cơ, và các mạch điều khiển khác."
+    },
+    {
+      "question": "Tại sao cần phải sử dụng tụ ghép nối trong mạch khuếch đại BJT?",
+      "answer": "Tụ ghép nối ngăn chặn thành phần DC của tín hiệu ảnh hưởng đến các giai đoạn khác trong mạch và đảm bảo chỉ có tín hiệu AC được khuếch đại."
+    },
+    {
+      "question": "Thế nào là mạch khuếch đại đa cấp BJT?",
+      "answer": "Mạch khuếch đại đa cấp BJT sử dụng nhiều transistor để đạt được độ lợi cao hơn và các tính chất khác tốt hơn so với mạch khuếch đại một cấp."
+    }
+  ]
+}

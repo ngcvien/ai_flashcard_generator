@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Tải file - AI Flashcard Generator{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-upload"></i> Tải file lên để tạo flashcard</h3>
+            </div>
+            <div class="card-body">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label for="title" class="form-label">Tiêu đề bộ flashcard</label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               placeholder="Nhập tiêu đề cho bộ flashcard">
+                    </div>
+                      <div class="mb-4">
+                        <label for="num_cards" class="form-label">Số lượng flashcard muốn tạo</label>
+                        <input type="number" class="form-control" id="num_cards" name="num_cards" 
+                               value="10" min="5" max="50">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="user_note" class="form-label">
+                            <i class="fas fa-lightbulb text-warning"></i> Ghi chú cho AI
+                            <small class="text-muted">(không bắt buộc)</small>
+                        </label>
+                        <textarea class="form-control" id="user_note" name="user_note" rows="3"
+                                placeholder="Thêm yêu cầu đặc biệt cho AI khi tạo flashcard. Ví dụ:
+- Tập trung vào các khái niệm quan trọng
+- Thêm nhiều câu hỏi về [chủ đề cụ thể]
+- Tạo câu hỏi theo format [format mong muốn]"></textarea>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Chọn file</label>
+                        <div class="upload-area" id="uploadArea">
+                            <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-muted"></i>
+                            <p class="mb-2">Kéo thả file vào đây hoặc click để chọn</p>
+                            <p class="small text-muted">Hỗ trợ: PDF, DOCX, TXT (tối đa 16MB)</p>
+                            <input type="file" class="form-control d-none" id="fileInput" name="file" 
+                                   accept=".pdf,.docx,.txt">
+                        </div>
+                        <div id="fileInfo" class="mt-2 d-none">
+                            <div class="alert alert-info">
+                                <i class="fas fa-file"></i>
+                                <span id="fileName"></span>
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-2" 
+                                        onclick="clearFile()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                            <i class="fas fa-magic"></i>
+                            Tạo flashcard với AI
+                        </button>
+                    </div>
+                </form>
+                
+                <div id="progressArea" class="mt-4 d-none">
+                    <div class="text-center mb-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">AI đang tạo flashcard từ nội dung file...</p>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div id="result" class="mt-4 d-none"></div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5><i class="fas fa-lightbulb text-warning"></i> Mẹo để có kết quả tốt nhất:</h5>
+                <ul>
+                    <li>File nên có nội dung rõ ràng, có cấu trúc</li>
+                    <li>Tránh file có quá nhiều hình ảnh hoặc biểu đồ</li>
+                    <li>Nội dung tiếng Việt hoặc tiếng Anh đều được hỗ trợ</li>
+                    <li>File PDF nên có text có thể select được (không phải ảnh scan)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const uploadForm = document.getElementById('uploadForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressArea = document.getElementById('progressArea');
+    const result = document.getElementById('result');
+
+    // Upload area click
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            showFileInfo(files[0]);
+        }
+    });
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            showFileInfo(e.target.files[0]);
+        }
+    });
+
+    function showFileInfo(file) {
+        fileName.textContent = file.name;
+        fileInfo.classList.remove('d-none');
+        
+        // Auto-generate title if empty
+        const titleInput = document.getElementById('title');
+        if (!titleInput.value) {
+            const baseName = file.name.split('.')[0];
+            titleInput.value = `Flashcard từ ${baseName}`;
+        }
+    }
+
+    window.clearFile = function() {
+        fileInput.value = '';
+        fileInfo.classList.add('d-none');
+    };
+
+    // Form submit
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if (!fileInput.files.length) {
+            alert('Vui lòng chọn file');
+            return;
+        }
+
+        const formData = new FormData(uploadForm);
+        
+        submitBtn.disabled = true;
+        progressArea.classList.remove('d-none');
+        result.classList.add('d-none');
+        
+        // Simulate progress
+        let progress = 0;
+        const progressBar = document.querySelector('.progress-bar');
+        const progressInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            progressBar.style.width = progress + '%';
+        }, 500);
+
+        try {
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            
+            clearInterval(progressInterval);
+            progressBar.style.width = '100%';
+            
+            setTimeout(() => {
+                progressArea.classList.add('d-none');
+                
+                if (data.success) {
+                    result.innerHTML = `
+                        <div class="alert alert-success">
+                            <h5><i class="fas fa-check-circle"></i> Tạo flashcard thành công!</h5>
+                            <p>Đã tạo ${data.count} flashcard từ file của bạn.</p>
+                            <a href="/study/${data.flashcard_id}" class="btn btn-primary">
+                                <i class="fas fa-play"></i> Bắt đầu học ngay
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="alert alert-danger">
+                            <h5><i class="fas fa-exclamation-circle"></i> Có lỗi xảy ra!</h5>
+                            <p>${data.error}</p>
+                        </div>
+                    `;
+                }
+                
+                result.classList.remove('d-none');
+                submitBtn.disabled = false;
+            }, 1000);
+            
+        } catch (error) {
+            clearInterval(progressInterval);
+            progressArea.classList.add('d-none');
+            
+            result.innerHTML = `
+                <div class="alert alert-danger">
+                    <h5><i class="fas fa-exclamation-circle"></i> Có lỗi xảy ra!</h5>
+                    <p>Không thể kết nối đến server. Vui lòng thử lại.</p>
+                </div>
+            `;
+            result.classList.remove('d-none');
+            submitBtn.disabled = false;
+        }
+    });
+});
+</script>
+{% endblock %}

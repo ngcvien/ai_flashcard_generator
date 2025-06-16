@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center">
+                <h1 class="card-title mb-4">
+                    <i class="fas fa-brain text-primary"></i>
+                    AI Flashcard Generator
+                </h1>
+                <p class="card-text lead mb-4">
+                    Tạo flashcard thông minh từ tài liệu của bạn bằng AI
+                </p>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('upload_file') }}" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-upload"></i>
+                            Tải file lên để tạo flashcard
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('create_manual') }}" class="btn btn-outline-primary btn-lg w-100">
+                            <i class="fas fa-plus"></i>
+                            Tạo flashcard thủ công
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if flashcard_sets %}
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-folder"></i> Bộ flashcard của bạn</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for set in flashcard_sets %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ set.title }}</h5>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-cards-blank"></i> {{ set.count }} thẻ
+                                        <br>
+                                        <i class="fas fa-calendar"></i> {{ set.created_at[:10] }}
+                                    </small>
+                                </p>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ url_for('study', flashcard_id=set.id) }}" 
+                                       class="btn btn-primary btn-sm flex-fill">
+                                        <i class="fas fa-play"></i> Học
+                                    </a>
+                                    <button class="btn btn-danger btn-sm" 
+                                            onclick="deleteFlashcardSet('{{ set.id }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h3><i class="fas fa-info-circle text-info"></i> Hướng dẫn sử dụng</h3>
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <i class="fas fa-file-upload fa-3x text-primary mb-3"></i>
+                            <h5>1. Tải file lên</h5>
+                            <p>Hỗ trợ file PDF, DOCX, TXT</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <i class="fas fa-magic fa-3x text-success mb-3"></i>
+                            <h5>2. AI tạo flashcard</h5>
+                            <p>AI tự động tạo câu hỏi và đáp án</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <i class="fas fa-graduation-cap fa-3x text-warning mb-3"></i>
+                            <h5>3. Bắt đầu học</h5>
+                            <p>Luyện tập với flashcard được tạo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function deleteFlashcardSet(id) {
+    if (confirm('Bạn có chắc chắn muốn xóa bộ flashcard này?')) {
+        fetch(`/delete/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Có lỗi xảy ra khi xóa');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra');
+        });
+    }
+}
+</script>
+{% endblock %}
