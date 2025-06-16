@@ -358,5 +358,51 @@ def manage_flashcards(flashcard_id):
     
     return render_template('manage.html', data=data)
 
+@app.route('/explain/<flashcard_id>/<int:card_index>', methods=['POST'])
+def explain_question(flashcard_id, card_index):
+    data = load_flashcard_set(flashcard_id)
+    if not data or card_index >= len(data['flashcards']):
+        return jsonify({'error': 'Không tìm thấy câu hỏi'}), 404
+    
+    card = data['flashcards'][card_index]
+    
+    try:
+        prompt = f"""
+        Hãy giải thích chi tiết về câu hỏi và đáp án sau:
+        
+        Câu hỏi: {card['question']}
+        Đáp án: {card['answer']}
+        
+        Yêu cầu:
+        1. Giải thích ngắn gọn, dễ hiểu
+        2. Nếu có thể, đưa thêm ví dụ minh họa
+        3. Nếu là khái niệm, giải thích theo cách đơn giản nhất
+        4. Nếu là quy trình, liệt kê các bước rõ ràng
+        5. Nếu là so sánh, làm rõ sự khác biệt
+        
+        Hãy trả về giải thích dưới dạng HTML với các thẻ <p> cho đoạn văn và <ul>/<li> cho danh sách.
+        KHÔNG thêm ```html hoặc ``` vào đầu và cuối response.
+        """
+        
+        response = model.generate_content(prompt)
+        explanation = response.text
+        
+        # Loại bỏ các ký tự markdown không mong muốn
+        explanation = explanation.replace('```html', '').replace('```', '')
+        explanation = explanation.strip()
+        
+        # Chuyển đổi markdown thành HTML nếu cần
+        explanation = explanation.replace('\n\n', '</p><p>')
+        explanation = explanation.replace('\n', '<br>')
+        
+        return jsonify({
+            'success': True,
+            'explanation': f'<p>{explanation}</p>'
+        })
+        
+    except Exception as e:
+        print(f"Lỗi khi tạo giải thích: {e}")
+        return jsonify({'error': 'Không thể tạo giải thích'}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
