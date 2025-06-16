@@ -8,9 +8,13 @@ import docx
 import google.generativeai as genai
 from werkzeug.utils import secure_filename
 import re
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = 'AIzaSyCJJgnGPk_jDMlGr_4KRO20FvWwPVZb624'
+app.secret_key = os.getenv('FLASK_SECRET_KEY')
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
@@ -19,8 +23,7 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs('data', exist_ok=True)
 
 # Cấu hình Google Gemini API
-GOOGLE_API_KEY = "AIzaSyCJJgnGPk_jDMlGr_4KRO20FvWwPVZb624"  # Thay thế bằng API key của bạn
-genai.configure(api_key=GOOGLE_API_KEY)
+genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 model = genai.GenerativeModel('gemini-1.5-flash-latest')
 
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'txt'}
