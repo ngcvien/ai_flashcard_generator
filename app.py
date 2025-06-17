@@ -24,8 +24,9 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs('data', exist_ok=True)
 
 # Cấu hình Google Gemini API
+GENERATE_MODEL = 'gemini-2.0-flash'
 genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
-model = genai.GenerativeModel('gemini-1.5-flash-latest')
+model = genai.GenerativeModel(GENERATE_MODEL)
 
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'txt'}
 
